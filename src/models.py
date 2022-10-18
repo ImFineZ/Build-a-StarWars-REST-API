@@ -1,15 +1,20 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, ForeignKey
+from sqlalchemy.orm import relationship
+
 
 db = SQLAlchemy()
 
 
 class User(db.Model):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
+    """ favorite_planet = db.relationship('Favorite_planet', lazy=True) """
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.name
 
     def serialize(self):
         return {
@@ -20,6 +25,7 @@ class User(db.Model):
 
 
 class Peoples(db.Model):
+    __tablename__ = 'peoples'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     birth_year = db.Column(db.String(80), unique=False, nullable=False)
@@ -45,6 +51,7 @@ class Peoples(db.Model):
 
 
 class Planets(db.Model):
+    __tablename__ = 'planets'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     climate = db.Column(db.String(80), unique=False, nullable=False)
@@ -52,6 +59,7 @@ class Planets(db.Model):
     orbital_period = db.Column(db.String(80), unique=False, nullable=False)
     rotation_period = db.Column(db.String(80), unique=False, nullable=False)
     diameter = db.Column(db.String(80), unique=False, nullable=False)
+    favorite_planet = db.relationship('Favorite_planet', lazy=True)
 
     def __repr__(self):
         return '<Planets %r>' % self.username
@@ -64,21 +72,47 @@ class Planets(db.Model):
             "population": self.population,
             "orbital_period": self.orbital_period,
             "rotation_period": self.rotation_period,
-            "diameter": self.diameter
+            "diameter": self.diameter,
+            'favorite_planet': self.favorite_planet
             # do not serialize the password, its a security breach
         }
 
 
-class Favorites(db.Model):
+class Favorite_planet(db.Model):
+    __tablename__ = 'favorite_planet'
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    planets_id = db.Column(db.Integer,  db.ForeignKey('planets.id'))
     name = db.Column(db.String(120), unique=True, nullable=False)
+    """ user = db.relationship(User)
+    planet = db.relationship(Planets) """
 
     def __repr__(self):
-        return '<Favorites %r>' % self.username
+        return '<Favorite_planet %r>' % self.username
+
+    def serialize(self):
+        return {
+            "id": self.id,           
+            "name": self.name,
+            # do not serialize the password, its a security breach
+        }
+
+
+class Favorite_people(db.Model):
+    __tablename__ = 'favorite_people'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    peoples_id = db.Column(db.Integer,  db.ForeignKey('peoples.id'))
+    user = db.relationship(User)
+    people = db.relationship(Peoples)
+
+    def __repr__(self):
+        return '<Favorites_people %r>' % self.username
 
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.name,
+            "user_id": self.user_id,
+            "peoples_id": self.peoples_id,
             # do not serialize the password, its a security breach
         }
