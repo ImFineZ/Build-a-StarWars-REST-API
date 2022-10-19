@@ -91,14 +91,45 @@ def get_planet(planet_id):
 @app.route('/addfavoriteplanet/<int:id>/', methods=['POST'])
 def add_planet(id):
     planet_query = Planets.query.get(id)
-    favorite_planet = Favorite_planet(name=planet_query.name)
+    favorite_planet = Favorite_planet(planet_name=planet_query.planet_name)
     db.session.add(favorite_planet)
     db.session.commit()
     respuesta = {
-        "Planeta agregado": favorite_planet,
+
         "message": "favorito agregado exitosamente"
     }
     return jsonify(respuesta), 200
+
+
+@app.route('/addfavoritepeople/<int:id>/', methods=['POST'])
+def add_people(id):
+    people_query = Peoples.query.get(id)
+    favorite_people = Favorite_people(people_name=people_query.people_name)
+    db.session.add(favorite_people)
+    db.session.commit()
+    respuesta = {
+        "message": "favorito agregado exitosamente"
+    }
+    return jsonify(respuesta), 200
+
+
+@app.route('/deletefavoriteplanet/<int:id>/', methods=['DELETE'])
+def delete_favoriteplanet(id):
+    planet_query = Favorite_planet.query.get(id)
+    #favorite_planet = Favorite_planet(planet_name=planet_query.planet_name)
+    if planet_query is None:
+        print(planet_query)
+        raise APIException('User not found', status_code=404)
+    #else:
+        db.session.delete(planet_query)
+        db.session.commit()
+
+    return jsonify(planet_query)
+
+
+"""   del Favorite_planet[id]
+    print("This is the position to delete: ",id)
+    return jsonify(Favorite_planet),200 """
 
 
 """ @app.route("/favorite_people", methods=["GET"])

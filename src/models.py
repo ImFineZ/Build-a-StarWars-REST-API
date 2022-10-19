@@ -27,7 +27,7 @@ class User(db.Model):
 class Peoples(db.Model):
     __tablename__ = 'peoples'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
+    people_name = db.Column(db.String(120), unique=True, nullable=False)
     birth_year = db.Column(db.String(80), unique=False, nullable=False)
     gender = db.Column(db.String(80), unique=False, nullable=False)
     height = db.Column(db.String(80), unique=False, nullable=False)
@@ -40,7 +40,7 @@ class Peoples(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.name,
+            "people_name": self.people_name,
             "birth_year": self.birth_year,
             "gender": self.gender,
             "height": self.height,
@@ -51,15 +51,15 @@ class Peoples(db.Model):
 
 
 class Planets(db.Model):
-    __tablename__ = 'planets'
+    """ __tablename__ = 'planets' """
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
+    planet_name = db.Column(db.String(120), unique=True, nullable=False)
     climate = db.Column(db.String(80), unique=False, nullable=False)
     population = db.Column(db.String(80), unique=False, nullable=False)
     orbital_period = db.Column(db.String(80), unique=False, nullable=False)
     rotation_period = db.Column(db.String(80), unique=False, nullable=False)
     diameter = db.Column(db.String(80), unique=False, nullable=False)
-    favorite_planet = db.relationship('Favorite_planet', lazy=True)
+    """ favorite_planet = db.relationship('Favorite_planet', lazy=True) """
 
     def __repr__(self):
         return '<Planets %r>' % self.username
@@ -67,13 +67,13 @@ class Planets(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.name,
+            "planet_name": self.planet_name,
             "climate": self.climate,
             "population": self.population,
             "orbital_period": self.orbital_period,
             "rotation_period": self.rotation_period,
             "diameter": self.diameter,
-            'favorite_planet': self.favorite_planet
+            
             # do not serialize the password, its a security breach
         }
 
@@ -83,9 +83,10 @@ class Favorite_planet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     planets_id = db.Column(db.Integer,  db.ForeignKey('planets.id'))
-    name = db.Column(db.String(120), unique=True, nullable=False)
-    """ user = db.relationship(User)
-    planet = db.relationship(Planets) """
+    planet_name = db.Column(db.String(120), unique=True, nullable=False)
+    #user = db.relationship(User)
+    #planet = db.relationship(Planets)
+    
 
     def __repr__(self):
         return '<Favorite_planet %r>' % self.username
@@ -93,7 +94,9 @@ class Favorite_planet(db.Model):
     def serialize(self):
         return {
             "id": self.id,           
-            "name": self.name,
+            "planet_name": self.name,
+            "user_id": self.user_id,
+            "planets_id": self.planets_id,
             # do not serialize the password, its a security breach
         }
 
@@ -103,8 +106,9 @@ class Favorite_people(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     peoples_id = db.Column(db.Integer,  db.ForeignKey('peoples.id'))
-    user = db.relationship(User)
-    people = db.relationship(Peoples)
+    people_name = db.Column(db.String(120), unique=True, nullable=False)
+    #user = db.relationship(User)
+    #people = db.relationship(Peoples)
 
     def __repr__(self):
         return '<Favorites_people %r>' % self.username
@@ -112,6 +116,7 @@ class Favorite_people(db.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "people_name": self.people_name,
             "user_id": self.user_id,
             "peoples_id": self.peoples_id,
             # do not serialize the password, its a security breach
