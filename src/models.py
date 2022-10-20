@@ -51,7 +51,7 @@ class Peoples(db.Model):
 
 
 class Planets(db.Model):
-    """ __tablename__ = 'planets' """
+    __tablename__ = 'planets'
     id = db.Column(db.Integer, primary_key=True)
     planet_name = db.Column(db.String(120), unique=True, nullable=False)
     climate = db.Column(db.String(80), unique=False, nullable=False)
@@ -83,7 +83,7 @@ class Favorite_planet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     planets_id = db.Column(db.Integer,  db.ForeignKey('planets.id'))
-    planet_name = db.Column(db.String(120), unique=True, nullable=False)
+    #planet_name = db.Column(db.String(120), unique=True, nullable=False)
     #user = db.relationship(User)
     #planet = db.relationship(Planets)
     
@@ -94,19 +94,17 @@ class Favorite_planet(db.Model):
     def serialize(self):
         return {
             "id": self.id,           
-            "planet_name": self.name,
             "user_id": self.user_id,
             "planets_id": self.planets_id,
             # do not serialize the password, its a security breach
         }
-
-
+        
 class Favorite_people(db.Model):
     __tablename__ = 'favorite_people'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     peoples_id = db.Column(db.Integer,  db.ForeignKey('peoples.id'))
-    people_name = db.Column(db.String(120), unique=True, nullable=False)
+    #people_name = db.Column(db.String(120), unique=True, nullable=False)
     #user = db.relationship(User)
     #people = db.relationship(Peoples)
 
@@ -116,7 +114,6 @@ class Favorite_people(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "people_name": self.people_name,
             "user_id": self.user_id,
             "peoples_id": self.peoples_id,
             # do not serialize the password, its a security breach

@@ -9,7 +9,7 @@ from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User, Planets, Peoples, Favorite_people, Favorite_planet
-#from models import Person
+# from models import Person
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -88,69 +88,60 @@ def get_planet(planet_id):
     return jsonify(response_body), 200
 
 
-@app.route('/addfavoriteplanet/<int:id>/', methods=['POST'])
-def add_planet(id):
-    planet_query = Planets.query.get(id)
-    favorite_planet = Favorite_planet(planet_name=planet_query.planet_name)
-    db.session.add(favorite_planet)
+@app.route('/user/<int:user_id>/addfavoriteplanet/<int:planets_id>/', methods=['POST'])
+def add_planet(user_id, planets_id):
+    usuario_query = User.query.get(user_id)
+    fav_planet = Favorite_planet(
+        user_id=usuario_query.id, planets_id=int(planets_id))
+    db.session.add(fav_planet)
     db.session.commit()
-    respuesta = {
+    response_body = {"msg": "Favorito agregado"}
+    return jsonify(response_body), 200
 
-        "message": "favorito agregado exitosamente"
-    }
-    return jsonify(respuesta), 200
-
-
-@app.route('/addfavoritepeople/<int:id>/', methods=['POST'])
-def add_people(id):
-    people_query = Peoples.query.get(id)
-    favorite_people = Favorite_people(people_name=people_query.people_name)
-    db.session.add(favorite_people)
+    """ fav_people = Favorites_people(user_id=int(user_id), people_id=int(people_id))
+    db.session.add(fav_people)
     db.session.commit()
-    respuesta = {
-        "message": "favorito agregado exitosamente"
-    }
-    return jsonify(respuesta), 200
+    response_body = {"msg": "Favorito agregado"}
+    return jsonify(response_body), 200 """
 
 
-@app.route('/deletefavoriteplanet/<int:id>/', methods=['DELETE'])
-def delete_favoriteplanet(id):
-    planet_query = Favorite_planet.query.get(id)
-    #favorite_planet = Favorite_planet(planet_name=planet_query.planet_name)
-    if planet_query is None:
-        print(planet_query)
-        raise APIException('User not found', status_code=404)
-    #else:
-        db.session.delete(planet_query)
-        db.session.commit()
+@app.route('/user/<int:user_id>/addfavoritepeople/<int:peoples_id>/', methods=['POST'])
+def add_people(user_id, peoples_id):
+    usuario_query = User.query.get(user_id)
+    fav_people = Favorite_people(
+        user_id=usuario_query.id, peoples_id=int(peoples_id))
+    db.session.add(fav_people)
+    db.session.commit()
+    response_body = {"msg": "Favorito agregado"}
+    return jsonify(response_body), 200
 
-    return jsonify(planet_query)
+@app.route('/user/<int:user_id>/deletefavoriteplanet/<int:planets_id>/', methods=['DELETE'])
+def delete_favoriteplanet(user_id, planets_id):
+    delete = Favorite_planet.query.filter_by(
+        planets_id=planets_id, user_id=user_id).first()
+    db.session.delete(delete)
+    db.session.commit()
+    return jsonify({"msg": "Deleted planet"}), 200
 
 
-"""   del Favorite_planet[id]
-    print("This is the position to delete: ",id)
-    return jsonify(Favorite_planet),200 """
+@app.route('/user/<int:user_id>/deletefavoritepeople/<int:peoples_id>/', methods=['DELETE'])
+def delete_favoritepeople(user_id, peoples_id):
+    delete = Favorite_people.query.filter_by(
+        peoples_id=peoples_id, user_id=user_id).first()
+    db.session.delete(delete)
+    db.session.commit()
+    return jsonify({"msg": "Deleted planet"}), 200
 
-
-""" @app.route("/favorite_people", methods=["GET"])
-def get_favorite_people():
-    favorites = Favorite_people.query.filter().all()
-    result = list(map(lambda favorite_people: favorite_people.serialize(), favorites))
-    response_body = {
-        "Usuarios": result,
-        "msg": "Hello, this is your GET /favorites People response "
-    }
-    return  jsonify(response_body),200
-
-@app.route("/favorite_planet", methods=["GET"])
-def get_favorite_planet():
-    favorites = Favorite_planet.query.filter().all()
-    result = list(map(lambda favorite_planet: favorite_planet.serialize(), favorites))
-    response_body = {
-        "Usuarios": result,
-        "msg": "Hello, this is your GET /favorites Planet response "
-    }
-    return  jsonify(response_body),200 """
+# ****Para agregar los favoritos de usuario especifico****
+""" @app.route("/user/<int:user_id>/favorites", methods=["GET"])
+def get_favorites(user_id):
+planets = Favorites_planet.query.filter_by(user_id=user_id).all()
+people = Favorites_people.query.filter_by(user_id=user_id).all()
+vehicles = Favorites_vehicles.query.filter_by(user_id=user_id).all()
+result = (list(map(lambda planet: planet.serialize(), planets)),
+list(map(lambda character: character.serialize(), people)),
+list(map(lambda vehicle: vehicle.serialize(), vehicles)))
+return jsonify(result), 200 """
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
