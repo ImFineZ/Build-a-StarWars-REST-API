@@ -52,7 +52,7 @@ def get_peoples():
     result = list(map(lambda people: people.serialize(), peoples))
     response_body = {
         "Usuarios": result,
-        "msg": "Hello, this is your GET /people response "
+        "msg": "Hello, this is your GET /people response"
     }
     return jsonify(response_body), 200
 
@@ -61,10 +61,9 @@ def get_peoples():
 def get_people(people_id):
     people = Peoples.query.get(people_id)
     response_body = {
-        "Usuarios": result,
-        "msg": "Hello, this is your GET /people response individual "
+       "people": people
     }
-    return jsonify(response_body), 200
+    return jsonify(people.serialize()), 200
 
 
 @app.route("/planet", methods=["GET"])
@@ -81,11 +80,7 @@ def get_planets():
 @app.route('/planet/<int:planet_id>', methods=['GET'])
 def get_planet(planet_id):
     planet = Planets.query.get(planet_id)
-    response_body = {
-        "Usuarios": result,
-        "msg": "Hello, this is your GET /planet response individual"
-    }
-    return jsonify(response_body), 200
+    return jsonify(planet.serialize()), 200
 
 
 @app.route('/user/<int:user_id>/addfavoriteplanet/<int:planets_id>/', methods=['POST'])
